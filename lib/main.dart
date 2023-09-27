@@ -4,7 +4,6 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nigerian_ussd_codes/codeList.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
-import 'dart:io';
 
 import 'ad_helper.dart';
 
@@ -32,7 +31,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -45,10 +44,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   // TODO: Add _bannerAd
-  BannerAd _bannerAd;
-  BannerAd _bannerAd2;
-  BannerAd _bannerAd3;
-  BannerAd _bannerAd4;
+  late BannerAd _bannerAd;
+  late BannerAd _bannerAd2;
+  late BannerAd _bannerAd3;
+  late BannerAd _bannerAd4;
 
 // TODO: Add _isBannerAdReady
   bool _isBannerAdReady = false;
@@ -258,7 +257,7 @@ class showBannerAds extends StatelessWidget {
   final double height;
   final BannerAd bannerAd;
 
-  const showBannerAds({Key key, this.width, this.height, this.bannerAd})
+  const showBannerAds({Key? key, required this.width, required this.height, required this.bannerAd})
       : super(key: key);
 
   @override
