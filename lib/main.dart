@@ -3,6 +3,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nigerian_ussd_codes/codeList.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'dart:async';
+import 'dart:io';
 import 'dart:async';
 
 import 'ad_helper.dart';
@@ -60,13 +63,51 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     // Load ads.
     print('initstate called');
+    _loadAds();
+  }
+
+  Future<void> _loadAds() async {
+    if (Platform.isIOS) {
+      var status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        await Future.delayed(const Duration(seconds: 3));
+        status = await AppTrackingTransparency.requestTrackingAuthorization();
+      }
+      if (status == TrackingStatus.authorized) {
+        final params = ConsentRequestParameters();
+        ConsentInformation.instance.requestConsentInfoUpdate(
+          params,
+              () async {
+            if (await ConsentInformation.instance.isConsentFormAvailable()) {
+              loadForm();
+            }
+          },
+              (FormError error) {
+            // Handle the error
+          },
+        );
+      }
+    }
+
     MobileAds.instance.initialize();
 
-    _bannerAd = BannerAd(
+    _bannerAd = _createBannerAd();
+    _bannerAd2 = _createBannerAd();
+    _bannerAd3 = _createBannerAd();
+    _bannerAd4 = _createBannerAd();
+
+    _bannerAd.load();
+    _bannerAd2.load();
+    _bannerAd3.load();
+    _bannerAd4.load();
+  }
+
+  BannerAd _createBannerAd() {
+    return BannerAd(
       adUnitId: AdHelper.bannerAdUnitId,
       request: AdRequest(),
       size: AdSize.banner,
-      listener: AdListener(
+      listener: BannerAdListener(
         onAdLoaded: (_) {
           setState(() {
             _isBannerAdReady = true;
@@ -79,72 +120,8 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
     );
-    _bannerAd.load();
-
-
-
-
-    _bannerAd2 = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: AdRequest(),
-      size: AdSize.banner,
-      listener: AdListener(
-        onAdLoaded: (_) {
-          setState(() {
-            _isBannerAdReady2 = true;
-            print('banner 2 loaded');
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          print('Failed to load a banner ad: ${err.message}');
-          _isBannerAdReady2 = false;
-          ad.dispose();
-        },
-      ),
-    );
-    _bannerAd2.load();
-
-    _bannerAd3 = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: AdRequest(),
-      size: AdSize.banner,
-      listener: AdListener(
-        onAdLoaded: (_) {
-          setState(() {
-            _isBannerAdReady3 = true;
-            print('banner 3 loaded');
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          print('Failed to load a banner ad: ${err.message}');
-          _isBannerAdReady3 = false;
-          ad.dispose();
-        },
-      ),
-    );
-    _bannerAd3.load();
-
-     _bannerAd4 = BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      request: AdRequest(),
-      size: AdSize.banner,
-      listener: AdListener(
-        onAdLoaded: (_) {
-          setState(() {
-            _isBannerAdReady4 = true;
-            print('banner 4 loaded');
-          });
-        },
-        onAdFailedToLoad: (ad, err) {
-          print('Failed to load a banner ad: ${err.message}');
-          _isBannerAdReady4 = false;
-          ad.dispose();
-        },
-      ),
-    );
-    _bannerAd4.load();
-
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -196,11 +173,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 Center(
                   child: Column(
                     children: [
-                      if (_isBannerAdReady)
-                      showBannerAds(
-                          height: _bannerAd.size.height.toDouble(),
-                          width: _bannerAd.size.width.toDouble(),
-                          bannerAd: _bannerAd),
+                      if (true)
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 20.0),
+                          child:
+                          showBannerAds(
+                              height: _bannerAd.size.height.toDouble(),
+                              width: _bannerAd.size.width.toDouble(),
+                              bannerAd: _bannerAd),
+                        ),
                       Expanded(child: mtnListView()),
                     ],
                   ),
@@ -208,11 +189,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 Center(
                   child: Column(
                     children: [
-                      if (_isBannerAdReady2)
-                      showBannerAds(
-                          height: _bannerAd2.size.height.toDouble(),
-                          width: _bannerAd2.size.width.toDouble(),
-                          bannerAd: _bannerAd2),
+                      if (true)
+                    Container(
+                margin: EdgeInsets.symmetric(vertical: 20.0),
+                child:
+                showBannerAds(
+                            height: _bannerAd2.size.height.toDouble(),
+                            width: _bannerAd2.size.width.toDouble(),
+                            bannerAd: _bannerAd2),
+                    ),
                       Expanded(child: airtelListView()),
                     ],
                   ),
@@ -220,22 +205,30 @@ class _MyHomePageState extends State<MyHomePage> {
                 Center(
                   child: Column(
                     children: [
-                      if (_isBannerAdReady3)
-                      showBannerAds(
-                          height: _bannerAd3.size.height.toDouble(),
-                          width: _bannerAd3.size.width.toDouble(),
-                          bannerAd: _bannerAd3),
+                      if (true)
+                    Container(
+                margin: EdgeInsets.symmetric(vertical: 20.0),
+                child:
+                showBannerAds(
+                            height: _bannerAd3.size.height.toDouble(),
+                            width: _bannerAd3.size.width.toDouble(),
+                            bannerAd: _bannerAd3),
+                    ),
                       Expanded(child: ninemobileListView()),
                     ],
                   ),
                 ),
                 Center(
                   child: Column(
-                    children: [  if (_isBannerAdReady4)
-                      showBannerAds(
+                    children: [ if (true)
+                    Container(
+                margin: EdgeInsets.symmetric(vertical: 20.0),
+                child:
+                showBannerAds(
                           height: _bannerAd4.size.height.toDouble(),
                           width: _bannerAd4.size.width.toDouble(),
                           bannerAd: _bannerAd4),
+                    ),
                       Expanded(child: gloListView()),
                     ],
                   ),
@@ -250,6 +243,25 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: Initialize Google Mobile Ads SDK
     return MobileAds.instance.initialize();
   }
+
+  void loadForm() {
+    ConsentForm.loadConsentForm(
+          (ConsentForm consentForm) async {
+        var status = await ConsentInformation.instance.getConsentStatus();
+        if (status == ConsentStatus.required) {
+          consentForm.show(
+                (formError) {
+              // Handle dismissal by reloading form
+              loadForm();
+            },
+          );
+        }
+      },
+          (formError) {
+        // Handle the error
+      },
+    );
+  }
 }
 
 class showBannerAds extends StatelessWidget {
@@ -257,7 +269,8 @@ class showBannerAds extends StatelessWidget {
   final double height;
   final BannerAd bannerAd;
 
-  const showBannerAds({Key? key, required this.width, required this.height, required this.bannerAd})
+  const showBannerAds(
+      {Key? key, required this.width, required this.height, required this.bannerAd})
       : super(key: key);
 
   @override
